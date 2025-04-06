@@ -22,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = '4O4OqoUso2b5yDi5khTGuG64Nohk9wpyDaRaVRtOF0QHfXUHUCqaLslmSTydPgvIZO2UtEbYOFJPbx51Sxu6Fw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -106,7 +106,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # }
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=600)
+    'default': dj_database_url.config(default='postgresql://futurepulseai_user:9eJ9emnbkPBcWzDU5AAkbttwwhxODt1A@dpg-cvltthodl3ps73a0160g-a.oregon-postgres.render.com/futurepulseai', conn_max_age=600)
 }
 
 
@@ -162,15 +162,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 
 EMAIL_PORT = 587
 
+EMAIL_HOST_USER = 'pawhncho@gmail.com'
 
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') or ''
-
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') or ''
-
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') or 'nhfuqtqyehncnmkp'
 
 EMAIL_USE_TLS = True
 
