@@ -10,6 +10,8 @@ urlpatterns = [
 	path('send-verification-email/', views.send_verification_email),
 	path('verify-email/<token>/', views.verify_email),
 	path('profile/', views.profile),
+	path('turn-on-notifications/', views.turn_on_notifications),
+	path('turn-off-notifications/', views.turn_off_notifications),
 	path('update-profile/', views.update_profile),
 	path('submit-report/', views.submit_report),
 	path('submit-prediction/', views.submit_prediction),

@@ -10,6 +10,7 @@ class Profile(models.Model):
 	timestamp = models.DateTimeField(default=datetime.now, db_index=True)
 	last_modified = models.DateTimeField(default=datetime.now, db_index=True)
 	verification_status = models.BooleanField(default=False, db_index=True)
+	notification_status = models.BooleanField(default=False, db_index=True)
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', db_index=True)
 
 class Report(models.Model):

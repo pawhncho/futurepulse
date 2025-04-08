@@ -131,6 +131,36 @@ def profile(request):
 	profile_serializer = ProfileSerializer(profile, read_only=True)
 	return Response({ 'data': profile_serializer.data, 'status': 200 }, status=200)
 
+@api_view(['GET'])
+def turn_on_notifications(request):
+	token = request.GET.get('token')
+	if not token:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	try:
+		token = Token.objects.filter(key=token).first()
+		user = token.user
+	except:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	profile = Profile.objects.filter(user=user).first()
+	profile.notification_status = True
+	profile.save()
+	return Response({ 'data': 'Notifications are on', 'status': 200 }, status=200)
+
+@api_view(['GET'])
+def turn_off_notifications(request):
+	token = request.GET.get('token')
+	if not token:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	try:
+		token = Token.objects.filter(key=token).first()
+		user = token.user
+	except:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	profile = Profile.objects.filter(user=user).first()
+	profile.notification_status = False
+	profile.save()
+	return Response({ 'data': 'Notifications are off', 'status': 200 }, status=200)
+
 @api_view(['GET', 'POST'])
 def update_profile(request):
 	token = request.GET.get('token')
