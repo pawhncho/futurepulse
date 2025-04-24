@@ -14,7 +14,9 @@ urlpatterns = [
 	path('turn-off-notifications/', views.turn_off_notifications),
 	path('update-profile/', views.update_profile),
 	path('submit-report/', views.submit_report),
+	path('reports/', views.reports),
 	path('submit-prediction/', views.submit_prediction),
+	path('predictions/', views.predictions),
 	path('submit-feedback/', views.submit_feedback),
 	path('feedbacks/', views.feedbacks),
 ]

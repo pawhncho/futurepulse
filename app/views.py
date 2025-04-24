@@ -209,10 +209,23 @@ def submit_report(request):
 		sensor_data = request.data.get('sensor_data')
 		rating = request.data.get('rating')
 		Report.objects.create(latitude=latitude, longitude=longitude, report_type=report_type, description=description,
-								sensor_data=sensor_data, status='pending', verification_status='unverified',
+								sensor_data=sensor_data, status='pending', verification_status=False,
 								rating=rating, user=user)
 		return Response({ 'data': 'Report has been submitted', 'status': 200 }, status=200)
 	return Response({ 'data': 'Report Submission API - Fields are required', 'status': 400 }, status=400)
+
+@api_view(['GET'])
+def reports(request):
+	token = request.GET.get('token')
+	if not token:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	try:
+		token = Token.objects.filter(key=token).first()
+	except:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	reports = Report.objects.all()[::-1]
+	reports_serializer = ReportSerializer(reports, read_only=True, many=True)
+	return Response({ 'data': reports_serializer.data, 'status': 200 }, status=200)
 
 @api_view(['GET', 'POST'])
 def submit_prediction(request):
@@ -240,40 +253,28 @@ def submit_prediction(request):
 		prediction = Prediction.objects.create(predicted_event=predicted_event, generated_text=generated_text,
 									confidence_score=confidence_score, valid_until=valid_until if valid_until else None,
 										ai_model_version=ai_model_version, user=user, report=report)
+		prediction_serializer = PredictionSerializer(prediction, read_only=True)
 		channel_layer = get_channel_layer()
 		async_to_sync(channel_layer.group_send)(
 			'notifications',
-			{'type': 'send_notification', 'message': prediction}
+			{'type': 'send_notification', 'message': prediction_serializer.data}
 		)
 		return Response({ 'data': 'Prediction has been submitted', 'status': 200 }, status=200)
 	return Response({ 'data': 'Prediction Submission API - Fields are required', 'status': 400 }, status=400)
-	
-"""
-@api_view(['GET', 'POST'])
-def submit_prediction(request):
-	if request.method == 'POST':
-		prompt = request.data.get('prompt')
-		predicted_event = request.data.get('predicted_event')
-		confidence_score = request.data.get('confidence_score')
-		valid_until = request.data.get('valid_until')
-		ai_model_version = request.data.get('ai_model_version')
-		try:
-			openai.api_key = settings.OPENAI_API_KEY
-			response = openai.ChatCompletion.create(
-				model='gpt-4',
-				messages=[{ 'role': 'user', 'content': prompt }],
-				temperature=0.7
-			)
-			generated_text = response['choices'][0]['message']['content']
-		except:
-			return Response({ 'data': 'The API is not responding', 'status': 400 }, status=400)
-		Prediction.objects.create(predicted_event=predicted_event, generated_text=generated_text,
-									confidence_score=confidence_score, valid_until=valid_until if valid_until else None,
-										ai_model_version=ai_model_version, user=user, report=report)
-		return Response({ 'data': 'Prediction has been submitted', 'status': 200 }, status=200)
-	return Response({ 'data': 'Prediction Submission API - Fields are required', 'status': 400 }, status=400)
-"""
 
+@api_view(['GET'])
+def predictions(request):
+	token = request.GET.get('token')
+	if not token:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	try:
+		token = Token.objects.filter(key=token).first()
+	except:
+		return Response({ 'data': 'Invalid token', 'status': 400 }, status=400)
+	predictions = Prediction.objects.all()[::-1]
+	predictions_serializer = PredictionSerializer(predictions, read_only=True, many=True)
+	return Response({ 'data': predictions_serializer.data, 'status': 200 }, status=200)
+	
 @api_view(['GET', 'POST'])
 def submit_feedback(request):
 	token = request.GET.get('token')
