@@ -237,13 +237,13 @@ def submit_prediction(request):
 		confidence_score = request.data.get('confidence_score')
 		valid_until = request.data.get('valid_until')
 		ai_model_version = request.data.get('ai_model_version')
-		Prediction.objects.create(predicted_event=predicted_event, generated_text=generated_text,
+		prediction = Prediction.objects.create(predicted_event=predicted_event, generated_text=generated_text,
 									confidence_score=confidence_score, valid_until=valid_until if valid_until else None,
 										ai_model_version=ai_model_version, user=user, report=report)
 		channel_layer = get_channel_layer()
 		async_to_sync(channel_layer.group_send)(
 			'notifications',
-			{'type': 'send_notification', 'message': 'A new prediction is available!'}
+			{'type': 'send_notification', 'message': prediction}
 		)
 		return Response({ 'data': 'Prediction has been submitted', 'status': 200 }, status=200)
 	return Response({ 'data': 'Prediction Submission API - Fields are required', 'status': 400 }, status=400)
