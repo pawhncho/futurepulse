@@ -62,7 +62,7 @@ def error_response(message, status_code):
     return Response({
         'status': 'error',
         'code': status_code,
-        'message': str(message),
+        'data': str(message),
         'timestamp': datetime.now().isoformat()
     }, status=status_code)
 
@@ -289,9 +289,15 @@ def submit_report(request):
         description = request.data.get('description')
         sensor_data = request.data.get('sensor_data')
         rating = request.data.get('rating')
-        Report.objects.create(latitude=latitude, longitude=longitude, report_type=report_type, description=description,
-                                sensor_data=sensor_data, status='pending', verification_status=False,
-                                rating=rating, user=user)
+        Report.objects.create(
+            latitude=latitude,
+            longitude=longitude,
+            report_type=report_type,
+            description=description,
+            sensor_data=sensor_data,
+            status='pending',
+            verification_status=False,
+            rating=rating, user=user)
         return success_response('Report has been submitted')
     return error_response('Report Submission API - Fields are required', status.HTTP_400_BAD_REQUEST)
 
@@ -331,9 +337,14 @@ def submit_prediction(request):
         confidence_score = request.data.get('confidence_score')
         valid_until = request.data.get('valid_until')
         ai_model_version = request.data.get('ai_model_version')
-        prediction = Prediction.objects.create(predicted_event=predicted_event, generated_text=generated_text,
-                                    confidence_score=confidence_score, valid_until=valid_until if valid_until else None,
-                                        ai_model_version=ai_model_version, user=user, report=report)
+        prediction = Prediction.objects.create(
+            predicted_event=predicted_event,
+            generated_text=generated_text,
+            confidence_score=confidence_score,
+            valid_until=valid_until if valid_until else None,
+            ai_model_version=ai_model_version,
+            user=user,
+            report=report)
         prediction_serializer = PredictionSerializer(prediction, read_only=True)
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
