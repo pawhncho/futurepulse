@@ -249,10 +249,16 @@ def update_profile(request):
         return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
     profile = Profile.objects.filter(user=user).first()
     if request.method == 'POST':
-        if request.data.get('first_name'):
-            user.first_name = request.data.get('first_name')
-        if request.data.get('last_name'):
-            user.last_name = request.data.get('last_name')
+        if request.data.get('first-name'):
+            user.first_name = request.data.get('first-name')
+        if request.data.get('last-name'):
+            user.last_name = request.data.get('last-name')
+        if request.data.get('email'):
+            try:
+                validate_email(email)
+                user.email = request.data.get('email')
+            except ValidationError as e:
+                return error_response(e.detail, status.HTTP_400_BAD_REQUEST)
         if request.data.get('username'):
             user.username = request.data.get('username')
         if request.data.get('profile-picture'):
