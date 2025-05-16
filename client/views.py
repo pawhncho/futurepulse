@@ -74,6 +74,9 @@ def success_response(data, status_code=status.HTTP_200_OK):
     }, status=status_code)
 
 # Create your views here.
+def reset_password_page(request):
+    return render(request, 'client/reset-password.html')
+    
 @api_view(['POST'])
 @throttle_classes([AuthRateThrottle])
 def login(request):
@@ -132,7 +135,7 @@ def forgot_password(request):
         token = signing.dumps({ 'identification': user.id })
         send_mail(
             'Reset Password',
-            f'Reset your password: {request.get_host()}/reset-password/{token}/',
+            f'Reset your password: {request.get_host()}/api/reset-password/?token={token}',
             'Future Pulse',
             [user.email],
         )
