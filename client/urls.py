@@ -16,8 +16,10 @@ urlpatterns = [
 	path('update-profile/', views.update_profile),
 	path('submit-report/', views.submit_report),
 	path('reports/', views.reports),
+	path('report/', views.report),
 	path('submit-prediction/', views.submit_prediction),
 	path('predictions/', views.predictions),
+	path('prediction/', views.prediction),
 	path('submit-feedback/', views.submit_feedback),
 	path('feedbacks/', views.feedbacks),
 ]

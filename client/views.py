@@ -328,6 +328,25 @@ def reports(request):
     reports_serializer = ReportSerializer(reports, read_only=True, many=True)
     return success_response(reports_serializer.data)
 
+@api_view(['GET'])
+def report(request):
+    token = request.GET.get('token')
+    report = request.GET.get('report')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not report:
+        return error_response('Invalid report', status.HTTP_400_BAD_REQUEST)
+    try:
+        report = Report.objects.filter(id=report).first()
+    except:
+        return error_response('Report not found', status.HTTP_400_BAD_REQUEST)
+    report_serializer = ReportSerializer(report, read_only=True)
+    return success_response(report_serializer.data)
+
 @api_view(['GET', 'POST'])
 def submit_prediction(request):
     token = request.GET.get('token')
@@ -380,6 +399,25 @@ def predictions(request):
     predictions = Prediction.objects.all()[::-1]
     predictions_serializer = PredictionSerializer(predictions, read_only=True, many=True)
     return success_response(predictions_serializer.data)
+
+@api_view(['GET'])
+def prediction(request):
+    token = request.GET.get('token')
+    prediction = request.GET.get('prediction')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not prediction:
+        return error_response('Invalid prediction', status.HTTP_400_BAD_REQUEST)
+    try:
+        prediction = Prediction.objects.filter(id=prediction).first()
+    except:
+        return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
+    prediction_serializer = PredictionSerializer(prediction, read_only=True)
+    return success_response(prediction_serializer.data)
 
 @api_view(['GET', 'POST'])
 def submit_feedback(request):
