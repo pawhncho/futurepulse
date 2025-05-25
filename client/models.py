@@ -39,7 +39,9 @@ class Prediction(models.Model):
 class Feedback(models.Model):
 	rating = models.IntegerField(null=True, blank=True, db_index=True)
 	comment = models.TextField(null=True, blank=True, db_index=True)
-	is_accurate = models.BooleanField(default=False, db_index=True)
+	is_accurate = models.BooleanField(default=False, null=True, blank=True, db_index=True)
 	timestamp = models.DateTimeField(default=datetime.now, db_index=True)
+	parent_feedback = models.ForeignKey('self', on_delete=models.CASCADE, related_name='replies', blank=True, null=True, db_index=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='feedbacks', blank=True, null=True, db_index=True)
-	prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE, related_name='feedbacks', db_index=True)
+	prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE, related_name='feedbacks', blank=True, null=True, db_index=True)
+	report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='feedbacks', blank=True, null=True, db_index=True)

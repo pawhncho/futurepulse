@@ -420,7 +420,26 @@ def prediction(request):
     return success_response(prediction_serializer.data)
 
 @api_view(['GET', 'POST'])
-def submit_feedback(request):
+def submit_report_feedback(request):
+    token = request.GET.get('token')
+    report = request.GET.get('report')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        rating = request.data.get('rating')
+        comment = request.data.get('comment')
+        is_accurate = request.data.get('is_accurate')
+        Feedback.objects.create(rating=rating, comment=comment, is_accurate=is_accurate, report=report)
+        return success_response('Feedback has been submitted')
+    return error_response('Feedback Submission API - Fields are required', status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'POST'])
+def submit_prediction_feedback(request):
     token = request.GET.get('token')
     prediction = request.GET.get('prediction')
     if not token:
@@ -438,6 +457,29 @@ def submit_feedback(request):
         return success_response('Feedback has been submitted')
     return error_response('Feedback Submission API - Fields are required', status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET', 'POST'])
+def submit_feedback_reply(request):
+    token = request.GET.get('token')
+    feedback = request.GET.get('feedback')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not feedback:
+        return error_response('Invalid feedback', status.HTTP_400_BAD_REQUEST)
+    try:
+        feedback = Feedback.objects.filter(id=feedback).first()
+    except:
+        return error_response('Feedback not found', status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        comment = request.data.get('comment')
+        Feedback.objects.create(comment=comment, parent_feedback=feedback, user=user)
+        return success_response('Reply has been submitted')
+    return error_response('Feedback Reply Submission API - Fields are required', status.HTTP_400_BAD_REQUEST)
+
 @api_view(['GET'])
 def feedbacks(request):
     prediction = request.GET.get('prediction')
@@ -450,3 +492,16 @@ def feedbacks(request):
         return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
     feedbacks_serializer = FeedbackSerializer(feedbacks, read_only=True, many=True)
     return success_response(feedbacks_serializer.data)
+
+@api_view(['GET'])
+def replies(request):
+    feedback = request.GET.get('feedback')
+    if not feedback:
+        return error_response('Invalid parameters', status.HTTP_400_BAD_REQUEST)
+    try:
+        feedback = Feedback.objects.filter(id=feedback).first()
+        replies = feedback.replies
+    except:
+        return error_response('Feedback not found', status.HTTP_400_BAD_REQUEST)
+    replies_serializer = FeedbackSerializer(replies, read_only=True, many=True)
+    return success_response(replies_serializer.data)

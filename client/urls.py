@@ -20,6 +20,9 @@ urlpatterns = [
 	path('submit-prediction/', views.submit_prediction),
 	path('predictions/', views.predictions),
 	path('prediction/', views.prediction),
-	path('submit-feedback/', views.submit_feedback),
+	path('submit-report-feedback/', views.submit_report_feedback),
+	path('submit-prediction-feedback/', views.submit_prediction_feedback),
+	path('submit-feedback-reply/', views.submit_feedback_reply),
 	path('feedbacks/', views.feedbacks),
+	path('replies/', views.replies),
 ]
