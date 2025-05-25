@@ -19,11 +19,9 @@ import re
 from .models import Profile, Report, Prediction, Feedback
 from .serializers import UserSerializer, ProfileSerializer, ReportSerializer, PredictionSerializer, FeedbackSerializer
 
-# Custom throttle classes
 class AuthRateThrottle(AnonRateThrottle):
     rate = '5/min'
 
-# Utility functions for validation
 def validate_password(password):
     if len(password) < 8:
         raise ValidationError('Password must be at least 8 characters long')
@@ -38,24 +36,24 @@ def validate_email(email):
     if not re.match(r'[^@]+@[^@]+\.[^@]+', email):
         raise ValidationError('Invalid email format')
 
-# def validate_image(image):
-#     if image.size > 5 * 1024 * 1024:  # 5MB limit
-#         raise ValidationError('Image size should not exceed 5MB')
-#     try:
-#         img = Image.open(image)
-#         if img.format.upper() not in ['JPEG', 'PNG']:
-#             raise ValidationError('Only JPEG and PNG images are allowed')
-#         return img
-#     except Exception as e:
-#         raise ValidationError('Invalid image format')
+def validate_image(image):
+    if image.size > 5 * 1024 * 1024:  # 5MB limit
+        raise ValidationError('Image size should not exceed 5MB')
+    try:
+        img = Image.open(image)
+        if img.format.upper() not in ['JPEG', 'PNG']:
+            raise ValidationError('Only JPEG and PNG images are allowed')
+        return img
+    except Exception as e:
+        raise ValidationError('Invalid image format')
 
-# def optimize_image(image, max_size=(800, 800)):
-#     img = Image.open(image)
-#     img.thumbnail(max_size, Image.LANCZOS)
-#     output = io.BytesIO()
-#     img.save(output, format='JPEG', quality=85, optimize=True)
-#     output.seek(0)
-#     return output
+def optimize_image(image, max_size=(800, 800)):
+    img = Image.open(image)
+    img.thumbnail(max_size, Image.LANCZOS)
+    output = io.BytesIO()
+    img.save(output, format='JPEG', quality=85, optimize=True)
+    output.seek(0)
+    return output
 
 def error_response(message, status_code):
     return Response({
