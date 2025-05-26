@@ -16,7 +16,7 @@ from asgiref.sync import async_to_sync
 from PIL import Image
 import io
 import re
-from .models import Profile, Report, Prediction, Feedback
+from .models import Profile, Report, ReportLike, Prediction, PredictionLike, Feedback 
 from .serializers import UserSerializer, ProfileSerializer, ReportSerializer, PredictionSerializer, FeedbackSerializer
 
 class AuthRateThrottle(AnonRateThrottle):
@@ -416,6 +416,142 @@ def prediction(request):
         return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
     prediction_serializer = PredictionSerializer(prediction, read_only=True)
     return success_response(prediction_serializer.data)
+
+@api_view(['GET'])
+def like_report_check(request):
+    token = request.GET.get('token')
+    report = request.GET.get('report')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not report:
+        return error_response('Invalid report', status.HTTP_400_BAD_REQUEST)
+    try:
+        report = Report.objects.filter(id=report).first()
+    except:
+        return error_response('Report not found', status.HTTP_400_BAD_REQUEST)
+    if ReportLike.objects.filter(report=report).filter(user=user).exists():
+        return success_response(True)
+    else:
+        return success_response(False)
+
+@api_view(['GET'])
+def like_report(request):
+    token = request.GET.get('token')
+    report = request.GET.get('report')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not report:
+        return error_response('Invalid report', status.HTTP_400_BAD_REQUEST)
+    try:
+        report = Report.objects.filter(id=report).first()
+    except:
+        return error_response('Report not found', status.HTTP_400_BAD_REQUEST)
+    if ReportLike.objects.filter(report=report).filter(user=user).exists():
+        return error_response('Bad request', status.HTTP_400_BAD_REQUEST)
+    ReportLike.objects.create(report=report, user=user)
+    return success_response(True)
+
+@api_view(['GET'])
+def dislike_report(request):
+    token = request.GET.get('token')
+    report = request.GET.get('report')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not report:
+        return error_response('Invalid report', status.HTTP_400_BAD_REQUEST)
+    try:
+        report = Report.objects.filter(id=report).first()
+    except:
+        return error_response('Report not found', status.HTTP_400_BAD_REQUEST)
+    if ReportLike.objects.filter(report=report).filter(user=user).exists():
+        report_like = ReportLike.objects.filter(report=report).filter(user=user).first()
+        report_like.delete()
+        return success_response(True)
+    else:
+        return error_response('Bad request', status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def like_prediction_check(request):
+    token = request.GET.get('token')
+    prediction = request.GET.get('prediction')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not prediction:
+        return error_response('Invalid prediction', status.HTTP_400_BAD_REQUEST)
+    try:
+        prediction = Prediction.objects.filter(id=prediction).first()
+    except:
+        return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
+    if PredictionLike.objects.filter(prediction=prediction).filter(user=user).exists():
+        return success_response(True)
+    else:
+        return success_response(False)
+
+@api_view(['GET'])
+def like_prediction(request):
+    token = request.GET.get('token')
+    prediction = request.GET.get('prediction')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not prediction:
+        return error_response('Invalid prediction', status.HTTP_400_BAD_REQUEST)
+    try:
+        prediction = Prediction.objects.filter(id=prediction).first()
+    except:
+        return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
+    if PredictionLike.objects.filter(prediction=prediction).filter(user=user).exists():
+        return error_response('Bad request', status.HTTP_400_BAD_REQUEST)
+    PredictionLike.objects.create(prediction=prediction, user=user)
+    return success_response(True)
+
+@api_view(['GET'])
+def dislike_prediction(request):
+    token = request.GET.get('token')
+    prediction = request.GET.get('prediction')
+    if not token:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    try:
+        token = Token.objects.filter(key=token).first()
+        user = token.user
+    except:
+        return error_response('Invalid token', status.HTTP_400_BAD_REQUEST)
+    if not prediction:
+        return error_response('Invalid prediction', status.HTTP_400_BAD_REQUEST)
+    try:
+        prediction = Prediction.objects.filter(id=prediction).first()
+    except:
+        return error_response('Prediction not found', status.HTTP_400_BAD_REQUEST)
+    if PredictionLike.objects.filter(prediction=prediction).filter(user=user).exists():
+        prediction_like = PredictionLike.objects.filter(prediction=prediction).filter(user=user).first()
+        prediction_like.delete()
+        return success_response(True)
+    else:
+        return error_response('Bad request', status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'POST'])
 def submit_report_feedback(request):
