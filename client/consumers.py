@@ -19,7 +19,7 @@ class ReportConsumer(WebsocketConsumer):
 		pass
 
 	def receive(self, text_data):
-		reports = Report.objects.filter(valid_until__gte=datetime.now()).order_by('-timestamp')
+		reports = Report.objects.all().order_by('-timestamp')
 		data = []
 		for report in reports:
 			data.append({
