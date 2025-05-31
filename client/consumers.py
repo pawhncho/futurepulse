@@ -28,8 +28,6 @@ class ReportConsumer(WebsocketConsumer):
 				'status': report.status,
 				'verification_status': report.verification_status,
 				'rating': report.rating,
-				'user': report.user,
-
 			})
 		self.send(text_data=json.dumps(data))
 
