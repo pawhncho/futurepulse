@@ -23,6 +23,7 @@ class ReportConsumer(WebsocketConsumer):
 		data = []
 		for report in reports:
 			data.append({
+				'location': report.location,
 				'report_type': report.report_type,
 				'description': report.description,
 				'status': report.status,

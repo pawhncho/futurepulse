@@ -15,6 +15,7 @@ class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', db_index=True)
 
 class Report(models.Model):
+	location = models.CharField(max_length=225, blank=True, null=True)
 	latitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
 	longitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
 	report_type = models.CharField(max_length=255, db_index=True) # e.g., traffic, noise, crowd level
