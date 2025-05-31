@@ -27,6 +27,20 @@ class Report(models.Model):
 	rating = models.FloatField(blank=True, null=True, db_index=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports', db_index=True)
 
+class ReportLike(models.Model):
+	timestamp = models.DateTimeField(default=datetime.now, db_index=True)
+	report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='likes', db_index=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_reports', db_index=True)
+
+	class Meta:
+		unique_together = ('report', 'user')
+
+	def save(self, *args, **kwargs):
+		if self.report.user == self.user:
+			pass
+		else:
+			save(*args, **kwargs)
+
 class Prediction(models.Model):
 	predicted_event = models.CharField(max_length=255, db_index=True)
 	generated_text = models.TextField(db_index=True)
@@ -36,6 +50,20 @@ class Prediction(models.Model):
 	timestamp = models.DateTimeField(default=datetime.now, db_index=True)
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='predictions', blank=True, null=True, db_index=True)
 	report = models.ForeignKey(Report, on_delete=models.CASCADE, related_name='predictions', db_index=True)
+
+class PredictionLike(models.Model):
+	timestamp = models.DateTimeField(default=datetime.now, db_index=True)
+	prediction = models.ForeignKey(Prediction, on_delete=models.CASCADE, related_name='likes', db_index=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_predictions', db_index=True)
+
+	class Meta:
+		unique_together = ('prediction', 'user')
+
+	def save(self, *args, **kwargs):
+		if self.prediction.user == self.user:
+			pass
+		else:
+			save(*args, **kwargs)
 
 class Feedback(models.Model):
 	rating = models.IntegerField(null=True, blank=True, db_index=True)
