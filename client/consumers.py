@@ -9,6 +9,7 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 from datetime import datetime
 from .models import Prediction, Report
+from .serializers import ReportSerializer, PredictionSerializer, FeedbackSerializer
 
 # Create your consumers here.
 class ReportConsumer(WebsocketConsumer):
@@ -20,16 +21,8 @@ class ReportConsumer(WebsocketConsumer):
 
 	def receive(self, text_data):
 		reports = Report.objects.all().order_by('-timestamp')
-		data = []
-		for report in reports:
-			data.append({
-				'report_type': report.report_type,
-				'description': report.description,
-				'status': report.status,
-				'verification_status': report.verification_status,
-				'rating': report.rating,
-			})
-		self.send(text_data=json.dumps(data))
+		reports_serializer = ReportSerializer(reports, read_only=True, many=True)
+		self.send(text_data=reports_serializer.data)
 
 class PredictionConsumer(WebsocketConsumer):
 	def connect(self):
