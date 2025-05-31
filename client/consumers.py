@@ -28,6 +28,9 @@ class ReportConsumer(WebsocketConsumer):
 				'status': report.status,
 				'verification_status': report.verification_status,
 				'rating': report.rating,
+				'timestamp': report.timestamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
+				'username': report.user.username,
+				'profile-picture': None,
 			})
 		self.send(text_data=json.dumps(data))
 
