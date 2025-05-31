@@ -25,7 +25,6 @@ class ReportConsumer(WebsocketConsumer):
 			data.append({
 				'report_type': report.report_type,
 				'description': report.description,
-				'timestamp': report.timestamp,
 				'status': report.status,
 				'verification_status': report.verification_status,
 				'rating': report.rating,
